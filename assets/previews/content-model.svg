@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 460" role="img" aria-labelledby="title desc">
+<title id="title">CONTENT MODEL</title><desc id="desc">Local mock portfolio preview artwork.</desc>
+<rect width="720" height="460" fill="#f4f3ef"/>
+<g fill="none" stroke="#d1d0cb" stroke-width="1"><path d="M36 60H684M36 400H684"/><path d="M36 80V380M684 80V380"/></g>
+<text x="38" y="38" font-family="Arial,sans-serif" font-size="11" letter-spacing="2" fill="#686868">MONOCHROME / PORTFOLIO</text>
+<text x="682" y="38" text-anchor="end" font-family="monospace" font-size="11" fill="#686868">03 / SYSTEMS</text>
+<g transform="translate(110 112)"><rect x="0" y="0" width="500" height="204" fill="#fbfbf8" stroke="#d1d0cb"/><g fill="#e8e7e2" stroke="#686868"><rect x="20" y="20" width="126" height="52"/><rect x="186" y="20" width="126" height="52"/><rect x="352" y="20" width="126" height="52"/><rect x="103" y="130" width="126" height="52"/><rect x="269" y="130" width="126" height="52"/></g><g stroke="#686868" stroke-width="1.3" fill="none"><path d="M146 46h40M312 46h40M83 72v28h83v30M415 72v28h-83v30M229 156h40"/></g><g fill="#303030"><circle cx="83" cy="100" r="4"/><circle cx="415" cy="100" r="4"/><circle cx="249" cy="156" r="4"/></g></g>
+<text x="38" y="432" font-family="Georgia,serif" font-size="26" fill="#171717">CONTENT MODEL</text>
+<text x="682" y="432" text-anchor="end" font-family="monospace" font-size="10" letter-spacing="1" fill="#686868">STUDY / 2026</text>
+</svg>

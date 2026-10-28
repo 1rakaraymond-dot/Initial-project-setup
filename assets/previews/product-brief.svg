@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 460" role="img" aria-labelledby="title desc">
+<title id="title">PRODUCT BRIEF</title><desc id="desc">Local mock portfolio preview artwork.</desc>
+<rect width="720" height="460" fill="#f4f3ef"/>
+<g fill="none" stroke="#d1d0cb" stroke-width="1"><path d="M36 60H684M36 400H684"/><path d="M36 80V380M684 80V380"/></g>
+<text x="38" y="38" font-family="Arial,sans-serif" font-size="11" letter-spacing="2" fill="#686868">MONOCHROME / PORTFOLIO</text>
+<text x="682" y="38" text-anchor="end" font-family="monospace" font-size="11" fill="#686868">03 / PRODUCT</text>
+<g transform="translate(170 95)"><rect width="340" height="258" fill="#fbfbf8" stroke="#171717"/><path d="M26 46H314M26 68H268M26 80H292" stroke="#d1d0cb" stroke-width="3"/><text x="26" y="34" font-family="monospace" font-size="11" fill="#686868">PROJECT / 003</text><text x="26" y="124" font-family="Georgia,serif" font-size="31" fill="#171717">Make it clear.</text><rect x="26" y="151" width="82" height="64" fill="#303030"/><rect x="122" y="151" width="82" height="64" fill="#e8e7e2"/><rect x="218" y="151" width="96" height="64" fill="#a7a7a3"/><path d="M26 236H314" stroke="#d1d0cb"/><text x="26" y="249" font-family="monospace" font-size="9" fill="#686868">GOAL / SCOPE / SIGNAL</text></g>
+<text x="38" y="432" font-family="Georgia,serif" font-size="26" fill="#171717">PRODUCT BRIEF</text>
+<text x="682" y="432" text-anchor="end" font-family="monospace" font-size="10" letter-spacing="1" fill="#686868">STUDY / 2026</text>
+</svg>

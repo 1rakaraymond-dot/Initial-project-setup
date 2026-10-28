@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 460" role="img" aria-labelledby="title desc">
+<title id="title">ACCESSIBILITY NOTES</title><desc id="desc">Local mock portfolio preview artwork.</desc>
+<rect width="720" height="460" fill="#f4f3ef"/>
+<g fill="none" stroke="#d1d0cb" stroke-width="1"><path d="M36 60H684M36 400H684"/><path d="M36 80V380M684 80V380"/></g>
+<text x="38" y="38" font-family="Arial,sans-serif" font-size="11" letter-spacing="2" fill="#686868">MONOCHROME / PORTFOLIO</text>
+<text x="682" y="38" text-anchor="end" font-family="monospace" font-size="11" fill="#686868">04 / SYSTEMS</text>
+<g transform="translate(190 96)"><rect width="340" height="260" fill="#fbfbf8" stroke="#171717"/><text x="24" y="32" font-family="monospace" font-size="11" fill="#686868">REVIEW / AA</text><g stroke="#d1d0cb" fill="none"><path d="M24 52H316M24 100H316M24 148H316M24 196H316"/></g><g fill="#303030"><rect x="24" y="66" width="16" height="16"/><rect x="24" y="114" width="16" height="16"/><rect x="24" y="162" width="16" height="16"/><rect x="24" y="210" width="16" height="16"/></g><g stroke="#f4f3ef" stroke-width="2" fill="none"><path d="M28 74l4 4 7-9M28 122l4 4 7-9M28 170l4 4 7-9M28 218l4 4 7-9"/></g><g fill="#686868"><rect x="56" y="69" width="196" height="4"/><rect x="56" y="117" width="224" height="4"/><rect x="56" y="165" width="160" height="4"/><rect x="56" y="213" width="204" height="4"/></g></g>
+<text x="38" y="432" font-family="Georgia,serif" font-size="26" fill="#171717">ACCESSIBILITY NOTES</text>
+<text x="682" y="432" text-anchor="end" font-family="monospace" font-size="10" letter-spacing="1" fill="#686868">STUDY / 2026</text>
+</svg>

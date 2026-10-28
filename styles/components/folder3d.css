@@ -1,0 +1,201 @@
+@layer components {
+  /* KNOB: folder tilt, lift and depth are controlled by tokens.css. */
+  .folder-stage {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    align-items: start;
+    gap: clamp(18px, 3vw, 42px) clamp(12px, 2.6vw, 36px);
+    padding: clamp(28px, 5vw, 68px) 0 clamp(42px, 7vw, 90px);
+    perspective: var(--perspective);
+    transform-style: preserve-3d;
+  }
+
+  .folder-tile { position: relative; grid-column: span 3; min-width: 0; }
+  .folder-tile:nth-child(1) { grid-column: 1 / span 4; margin-top: 12px; }
+  .folder-tile:nth-child(2) { grid-column: 5 / span 3; margin-top: 56px; }
+  .folder-tile:nth-child(3) { grid-column: 9 / span 4; margin-top: 0; }
+  .folder-tile:nth-child(4) { grid-column: 2 / span 3; margin-top: 12px; }
+  .folder-tile:nth-child(5) { grid-column: 5 / span 4; margin-top: 42px; }
+  .folder-tile:nth-child(6) { grid-column: 9 / span 3; margin-top: 8px; }
+  .folder-tile:nth-child(7) { grid-column: 4 / span 5; margin-top: 8px; }
+
+  .folder-tile__open { display: block; width: 100%; padding: 0; border: 0; background: transparent; color: inherit; text-align: left; cursor: pointer; }
+  .folder-tile__object-wrap { position: relative; display: block; width: min(100%, 330px); margin-inline: auto; perspective: var(--perspective); transform-style: preserve-3d; }
+  .folder-tile__shadow { position: absolute; right: 8%; bottom: -14px; left: 8%; height: 24%; border-radius: 50%; background: color-mix(in srgb, var(--color-soot) 23%, transparent); filter: blur(18px); transform: translateZ(-16px) scale(.84); transition: transform var(--dur-medium) var(--ease-out), opacity var(--dur-medium) var(--ease-out); }
+  .folder-tile__object { position: relative; display: block; aspect-ratio: 1.28 / 1; transform: rotateX(var(--folder-idle-tilt-x)) rotateY(var(--folder-idle-tilt-y)); transform-style: preserve-3d; transition: transform var(--dur-medium) var(--ease-out); animation: folder-float var(--folder-float-duration, 6000ms) ease-in-out infinite; }
+  .folder-tile:nth-child(even) .folder-tile__object { animation-delay: -1.6s; }
+  .folder-tile:nth-child(3n) .folder-tile__object { animation-delay: -3.2s; }
+  .folder-tile__paper { position: absolute; top: 5%; left: 11%; width: 74%; height: 68%; transform: translateZ(14px) rotate(-4deg); background: var(--color-paper-bright); border: 1px solid var(--color-line); box-shadow: var(--shadow-paper); }
+  .folder-tile__paper::before, .folder-tile__paper::after { position: absolute; left: 12%; right: 14%; height: 1px; background: var(--color-line); content: ""; }
+  .folder-tile__paper::before { top: 28%; box-shadow: 0 12px 0 var(--color-line), 0 24px 0 var(--color-line); }
+  .folder-tile__paper::after { top: 72%; right: 36%; }
+  .folder-tile__contents { position: absolute; z-index: 4; inset: 0; transform-style: preserve-3d; pointer-events: none; }
+  .folder-tile__sheet { position: absolute; top: 12%; left: 15%; width: 68%; height: 57%; border: 1px solid var(--color-vellum-border); background: var(--color-paper-bright); box-shadow: var(--shadow-paper); opacity: 0; transform: translate3d(0, 28px, 6px) scale(.92) rotateZ(var(--sheet-angle, -3deg)); transform-origin: 50% 100%; transition: transform var(--folder-open-duration, 520ms) var(--ease-in-out), opacity var(--dur-fast) linear; transition-delay: 0ms; }
+  .folder-tile__sheet::before { position: absolute; top: 26%; left: 12%; right: 14%; height: 1px; background: var(--color-line); box-shadow: 0 10px 0 var(--color-line), 0 20px 0 var(--color-line); content: ""; }
+  .folder-tile__sheet--one { --sheet-index: 0; --sheet-delay: 0ms; --sheet-angle: -5deg; }
+  .folder-tile__sheet--two { --sheet-index: 1; --sheet-delay: var(--folder-stagger, 40ms); --sheet-angle: 2deg; }
+  .folder-tile__sheet--three { --sheet-index: 2; --sheet-delay: calc(var(--folder-stagger, 40ms) + var(--folder-stagger, 40ms)); --sheet-angle: 6deg; }
+  .folder-tile__tab { position: absolute; z-index: 2; top: 13%; left: 9%; width: 42%; height: 22%; transform-origin: 50% 100%; transform: translateZ(20px) rotateX(-8deg); border: 1px solid var(--color-vellum-border); background: var(--color-paper-dim); transition: transform var(--folder-open-duration, 520ms) var(--ease-in-out); backface-visibility: hidden; }
+  .folder-tile__body { position: absolute; z-index: 3; inset: 28% 4% 4% 4%; border: 1px solid var(--color-vellum-border); background: linear-gradient(145deg, var(--color-vellum-top), var(--color-vellum-bottom)); clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); transform: translateZ(28px); box-shadow: inset 0 1px color-mix(in srgb, var(--color-inverse) 75%, transparent); }
+  .folder-tile__body::after { position: absolute; inset: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 140 140' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.25'/%3E%3C/svg%3E"); opacity: .25; content: ""; }
+  .folder-tile__body-edge { position: absolute; z-index: 2; right: 4%; bottom: 0; left: 4%; height: 8px; background: var(--color-graphite); transform: translateZ(24px) rotateX(-5deg); transform-origin: top; }
+  .folder-tile__object-wrap::after { position: absolute; z-index: 4; right: 6%; bottom: 7%; left: 6%; height: 1px; background: color-mix(in srgb, var(--color-inverse) 80%, transparent); content: ""; }
+  .folder-tile__caption { display: grid; gap: 4px; padding: 18px 4px 0; }
+  .folder-tile__actions { display: flex; gap: 12px; padding: 5px 4px 0; opacity: .62; transition: opacity var(--dur-fast) var(--ease-out); }
+  .folder-tile:hover .folder-tile__actions, .folder-tile:focus-within .folder-tile__actions { opacity: 1; }
+  .folder-tile__actions .file-action { font-size: 9px; }
+  .folder-tile__serial { color: var(--color-metal); font: 9px/1.2 var(--font-mono); letter-spacing: .1em; }
+  .folder-tile__name { overflow-wrap: anywhere; color: var(--color-ink); font: 400 clamp(19px, 2.1vw, 29px)/1.04 var(--font-display); letter-spacing: -.035em; }
+  .folder-tile__count { color: var(--color-metal); font: 10px/1.4 var(--font-mono); }
+  .folder-tile__open:hover .folder-tile__object, .folder-tile__open:focus-visible .folder-tile__object { transform: translateZ(var(--folder-hover-lift)) rotateX(2deg) rotateY(-2deg); }
+  .folder-tile__open:hover .folder-tile__shadow, .folder-tile__open:focus-visible .folder-tile__shadow { transform: translateZ(-16px) scale(1.06); }
+  .folder-tile__open:hover .folder-tile__tab, .folder-tile__open:focus-visible .folder-tile__tab { transform: translateZ(28px) rotateX(-14deg); }
+  .folder-tile__open:active .folder-tile__object { transform: translateZ(var(--folder-open-lift)) scale(.985); }
+  .folder-tile.is-opening, .folder-tile.is-open { z-index: 12; }
+  .folder-tile.is-opening .folder-tile__open .folder-tile__object, .folder-tile.is-open .folder-tile__open .folder-tile__object { transform: translateZ(var(--folder-open-lift)) rotateX(calc(var(--folder-idle-tilt-x) + var(--pointer-rotate-x, 0deg))) rotateY(calc(var(--folder-idle-tilt-y) + var(--pointer-rotate-y, 0deg))) translate3d(var(--pointer-shift-x, 0px), var(--pointer-shift-y, 0px), 0); animation-play-state: paused; }
+  .folder-tile.is-opening .folder-tile__open .folder-tile__tab, .folder-tile.is-open .folder-tile__open .folder-tile__tab { z-index: 5; transform: translateZ(30px) rotateX(-120deg); }
+  .folder-tile.is-opening .folder-tile__sheet, .folder-tile.is-open .folder-tile__sheet { opacity: 1; transform: translate3d(0, -20px, 58px) scale(1) rotateZ(var(--sheet-angle, 0deg)); transition-delay: var(--sheet-delay, 0ms); }
+  .folder-stage.is-shelf-dragging { cursor: grabbing; }
+  .folder-stage.is-shelf-dragging .folder-tile { transition: opacity var(--dur-fast) linear; }
+  .folder-tile.is-dragging { z-index: 30 !important; opacity: .94; cursor: grabbing; transition: none !important; transform: translate3d(var(--drag-x, 0px), var(--drag-y, 0px), 40px) scale(var(--folder-drag-scale, 1.035)); filter: drop-shadow(0 18px 16px var(--color-shadow-soft)); }
+  .folder-tile__open { cursor: grab; touch-action: pan-y; user-select: none; }
+  .folder-tile.is-dragging .folder-tile__open { cursor: grabbing; }
+  .folder-stage.is-reordered .folder-tile, .folder-stage.is-reordered .folder-tile:nth-child(n) { grid-column: span 3; margin-top: 0; }
+
+  @keyframes folder-float { 0%, 100% { translate: 0 0; } 50% { translate: 0 -4px; } }
+  @media (max-width: 900px) {
+    .folder-stage { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+    .folder-tile, .folder-tile:nth-child(n) { grid-column: span 2; margin-top: 0; }
+    .folder-tile:nth-child(4) { grid-column: 2 / span 2; }
+    .folder-tile:nth-child(7) { grid-column: 3 / span 2; }
+    .folder-tile__name { font-size: clamp(18px, 2.6vw, 25px); }
+  }
+  @media (max-width: 560px) {
+    .folder-stage { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 30px 14px; padding-block: 28px 42px; }
+    .folder-tile, .folder-tile:nth-child(n) { grid-column: span 1; margin-top: 0; }
+    .folder-tile:nth-child(2n) { padding-top: 28px; }
+    .folder-tile__object-wrap { width: 100%; }
+    .folder-tile__caption { padding-top: 10px; }
+    .folder-tile__actions { opacity: 1; gap: 8px; padding-top: 3px; }
+    .folder-tile__actions .file-action { font-size: 8px; }
+    .folder-tile__name { font: 400 20px/1.05 var(--font-display); }
+    .folder-tile__serial, .folder-tile__count { font-size: 8px; }
+    .folder-tile__object { animation: none; }
+    .folder-stage.is-reordered .folder-tile, .folder-stage.is-reordered .folder-tile:nth-child(n) { grid-column: span 1; }
+  }
+  @media (max-width: 900px) and (min-width: 561px) {
+    .folder-stage.is-reordered .folder-tile, .folder-stage.is-reordered .folder-tile:nth-child(n) { grid-column: span 2; margin-top: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .folder-tile__object { animation: none; transform: none; }
+    .folder-tile__object, .folder-tile__shadow, .folder-tile__tab, .folder-tile__sheet { transition: none; }
+    .folder-tile.is-dragging { filter: none; }
+  }
+}
+
+@layer components {
+  .folder-stage { position: relative; isolation: isolate; --ambient-shift: 0px; --ambient-opacity: .11; }
+  .folder-stage::before { position: absolute; z-index: -1; inset: -2% -5% 5%; pointer-events: none; background: radial-gradient(ellipse at 50% 34%, color-mix(in srgb, var(--color-vellum) 45%, transparent), transparent 63%); opacity: var(--ambient-opacity); transform: translate3d(0, var(--ambient-shift), 0); content: ""; }
+  .folder-stage.is-parallax-active .folder-tile__object { will-change: transform; }
+  .folder-tile__object { transform: rotateX(calc(var(--folder-idle-tilt-x) + var(--pointer-rotate-x, 0deg))) rotateY(calc(var(--folder-idle-tilt-y) + var(--pointer-rotate-y, 0deg))) translate3d(var(--pointer-shift-x, 0px), var(--pointer-shift-y, 0px), 0); }
+  .folder-tile[data-reveal] { transition-delay: var(--tile-delay, 0ms); }
+  @media (prefers-reduced-motion: reduce) {
+    .folder-stage::before { transform: none; }
+    .folder-tile__object { animation: none; transform: none; transition: none; }
+    .folder-tile__tab, .folder-tile__shadow, .folder-tile__sheet { transition: none; }
+    .folder-tile.is-dragging { filter: none; }
+    .folder-stage.is-parallax-active .folder-tile__object { will-change: auto; }
+  }
+}
+
+@layer components {
+  /* BLOOD MOON THEME: wine-red lacquer, aged brass edges and vellum sheets. */
+  .folder-tile__shadow {
+    background: radial-gradient(ellipse, var(--color-folder-shadow) 0%, var(--color-folder-shadow-low) 44%, transparent 74%);
+    filter: blur(20px);
+  }
+  .folder-tile__paper {
+    border-color: var(--color-vellum-border);
+    background: linear-gradient(135deg, var(--color-vellum-top), var(--color-vellum-bottom));
+    box-shadow: var(--shadow-paper), inset 0 0 0 3px color-mix(in srgb, var(--color-inverse) 9%, transparent);
+  }
+  .folder-tile__paper::before,
+  .folder-tile__paper::after { background: var(--color-vellum-line); }
+  .folder-tile__paper::before { box-shadow: 0 12px 0 color-mix(in srgb, var(--color-vellum-line) 82%, transparent), 0 24px 0 var(--color-vellum-line-soft); }
+  .folder-tile__sheet {
+    border-color: var(--color-vellum-sheet-border);
+    background: linear-gradient(145deg, var(--color-vellum-sheet-top), var(--color-vellum-sheet-bottom));
+    box-shadow: var(--shadow-paper), inset 0 0 0 3px color-mix(in srgb, var(--color-inverse) 6%, transparent);
+  }
+  .folder-tile__sheet::before {
+    background: color-mix(in srgb, var(--color-vellum-line) 118%, transparent);
+    box-shadow: 0 10px 0 color-mix(in srgb, var(--color-vellum-line) 91%, transparent), 0 20px 0 var(--color-vellum-line-soft);
+  }
+  .folder-tile__tab {
+    border-color: var(--color-folder-border);
+    background: linear-gradient(145deg, var(--color-folder-tab-top) 0%, var(--color-folder-tab-middle) 56%, var(--color-folder-tab-bottom) 100%);
+    box-shadow: inset 0 1px var(--color-warm-light), inset 0 -2px color-mix(in srgb, var(--color-soot) 23%, transparent);
+  }
+  .folder-tile__body {
+    border-color: var(--color-folder-border);
+    background: linear-gradient(145deg, var(--color-folder-top) 0%, var(--color-folder-middle) 43%, var(--color-folder-bottom) 100%);
+    box-shadow: inset 0 1px color-mix(in srgb, var(--color-brass) 28%, transparent), inset 0 0 0 2px var(--color-black-shadow), inset 0 -8px 14px var(--color-black-shadow);
+  }
+  .folder-tile__body::before {
+    position: absolute;
+    z-index: 1;
+    inset: 7px;
+    border: 1px solid var(--color-trim);
+    background:
+      linear-gradient(var(--color-brass), var(--color-brass)) top 7px left 7px / 13px 1px no-repeat,
+      linear-gradient(var(--color-brass), var(--color-brass)) top 7px left 7px / 1px 13px no-repeat,
+      linear-gradient(var(--color-brass), var(--color-brass)) top 7px right 7px / 13px 1px no-repeat,
+      linear-gradient(var(--color-brass), var(--color-brass)) top 7px right 7px / 1px 13px no-repeat,
+      linear-gradient(var(--color-brass), var(--color-brass)) bottom 7px left 7px / 13px 1px no-repeat,
+      linear-gradient(var(--color-brass), var(--color-brass)) bottom 7px left 7px / 1px 13px no-repeat,
+      linear-gradient(var(--color-brass), var(--color-brass)) bottom 7px right 7px / 13px 1px no-repeat,
+      linear-gradient(var(--color-brass), var(--color-brass)) bottom 7px right 7px / 1px 13px no-repeat;
+    content: "";
+    pointer-events: none;
+  }
+  .folder-tile__body::after {
+    opacity: .14;
+    mix-blend-mode: soft-light;
+  }
+  .folder-tile__body-edge {
+    border-top: 1px solid var(--color-trim-strong);
+    background: linear-gradient(180deg, var(--color-folder-edge-top), var(--color-folder-edge-bottom));
+  }
+  .folder-tile__object-wrap::after {
+    background: linear-gradient(90deg, transparent, var(--color-brass-glow), transparent);
+    box-shadow: 0 0 10px color-mix(in srgb, var(--color-blood) 24%, transparent);
+  }
+  .folder-tile__serial {
+    color: var(--color-brass);
+    font-size: 9px;
+    letter-spacing: .17em;
+  }
+  .folder-tile__serial::before {
+    display: inline-block;
+    width: 12px;
+    height: 1px;
+    margin: 0 8px 3px 0;
+    background: var(--color-blood-bright);
+    content: "";
+  }
+  .folder-tile__name {
+    color: var(--color-ink);
+    font-family: var(--font-display);
+    font-size: clamp(18px, 2.05vw, 28px);
+    font-weight: 500;
+    letter-spacing: .01em;
+    text-shadow: 0 1px 10px color-mix(in srgb, var(--color-soot) 20%, transparent);
+  }
+  .folder-tile__count { color: var(--color-folder-count); }
+  .folder-tile__open:hover .folder-tile__object,
+  .folder-tile__open:focus-visible .folder-tile__object {
+    filter: drop-shadow(0 0 12px color-mix(in srgb, var(--color-blood) 18%, transparent));
+  }
+  .folder-tile.is-dragging { filter: drop-shadow(0 20px 18px color-mix(in srgb, var(--color-soot) 48%, transparent)) drop-shadow(0 0 10px color-mix(in srgb, var(--color-blood) 16%, transparent)); }
+  .folder-stage.is-shelf-dragging .folder-tile:not(.is-dragging) { opacity: .78; }
+}

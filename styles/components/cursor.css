@@ -1,0 +1,18 @@
+@layer components {
+  .custom-cursor { position: fixed; z-index: 200; top: 0; left: 0; width: 1px; height: 1px; pointer-events: none; opacity: 0; transition: opacity 160ms ease; }
+  .custom-cursor.is-visible { opacity: 1; }
+  .custom-cursor__ring { position: absolute; top: -17px; left: -17px; width: 34px; height: 34px; border: 1px solid var(--color-brass); border-radius: 50%; background: color-mix(in srgb, var(--color-blood) 10%, transparent); transform: scale(.72); transition: transform 180ms var(--ease-out), background-color 180ms ease, border-color 180ms ease; }
+  .custom-cursor__dot { position: absolute; top: -2px; left: -2px; width: 4px; height: 4px; border-radius: 50%; background: var(--color-blood-bright); box-shadow: 0 0 8px color-mix(in srgb, var(--color-blood-bright) 50%, transparent); transition: transform 180ms var(--ease-out); }
+  .custom-cursor.is-active .custom-cursor__ring { border-color: var(--color-focus); background: color-mix(in srgb, var(--color-brass) 10%, transparent); transform: scale(1.12); }
+  .custom-cursor.is-folder .custom-cursor__ring { transform: scale(1.3); }
+  .custom-cursor.is-pressed .custom-cursor__ring { background: color-mix(in srgb, var(--color-blood) 28%, transparent); transform: scale(.9); }
+  body.has-custom-cursor a,
+  body.has-custom-cursor button,
+  body.has-custom-cursor input[type="button"],
+  body.has-custom-cursor input[type="submit"],
+  body.has-custom-cursor [role="button"] { cursor: none; }
+  @media (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce) {
+    .custom-cursor { display: none; }
+    body.has-custom-cursor a, body.has-custom-cursor button, body.has-custom-cursor [role="button"] { cursor: auto; }
+  }
+}

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 460" role="img" aria-labelledby="title desc">
+<title id="title">COMPONENT MAP</title><desc id="desc">Local mock portfolio preview artwork.</desc>
+<rect width="720" height="460" fill="#f4f3ef"/>
+<g fill="none" stroke="#d1d0cb" stroke-width="1"><path d="M36 60H684M36 400H684"/><path d="M36 80V380M684 80V380"/></g>
+<text x="38" y="38" font-family="Arial,sans-serif" font-size="11" letter-spacing="2" fill="#686868">MONOCHROME / PORTFOLIO</text>
+<text x="682" y="38" text-anchor="end" font-family="monospace" font-size="11" fill="#686868">02 / SYSTEMS</text>
+<g transform="translate(120 100)"><rect x="0" y="0" width="216" height="250" fill="#fbfbf8" stroke="#171717"/><rect x="244" y="0" width="216" height="250" fill="#e8e7e2" stroke="#d1d0cb"/><text x="22" y="30" font-family="monospace" font-size="11" fill="#686868">COMPONENT / A</text><rect x="22" y="53" width="170" height="34" fill="#303030"/><rect x="22" y="105" width="170" height="10" fill="#a7a7a3"/><rect x="22" y="125" width="120" height="10" fill="#a7a7a3"/><rect x="22" y="159" width="90" height="52" fill="#e8e7e2" stroke="#171717"/><text x="266" y="30" font-family="monospace" font-size="11" fill="#686868">COMPONENT / B</text><circle cx="294" cy="76" r="15" fill="#303030"/><path d="M322 76h102M322 90h76M266 127h168M266 143h132" stroke="#a7a7a3" stroke-width="4"/><rect x="266" y="170" width="168" height="42" fill="#fbfbf8" stroke="#171717"/></g>
+<text x="38" y="432" font-family="Georgia,serif" font-size="26" fill="#171717">COMPONENT MAP</text>
+<text x="682" y="432" text-anchor="end" font-family="monospace" font-size="10" letter-spacing="1" fill="#686868">STUDY / 2026</text>
+</svg>

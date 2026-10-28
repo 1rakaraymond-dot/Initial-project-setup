@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 460" role="img" aria-labelledby="title desc">
+<title id="title">SCROLL SEQUENCE</title><desc id="desc">Local mock portfolio preview artwork.</desc>
+<rect width="720" height="460" fill="#f4f3ef"/>
+<g fill="none" stroke="#d1d0cb" stroke-width="1"><path d="M36 60H684M36 400H684"/><path d="M36 80V380M684 80V380"/></g>
+<text x="38" y="38" font-family="Arial,sans-serif" font-size="11" letter-spacing="2" fill="#686868">MONOCHROME / PORTFOLIO</text>
+<text x="682" y="38" text-anchor="end" font-family="monospace" font-size="11" fill="#686868">04 / EXPERIMENTS</text>
+<g transform="translate(110 102)"><rect x="0" y="0" width="500" height="246" fill="#fbfbf8" stroke="#d1d0cb"/><path d="M38 34V212M462 34V212" stroke="#d1d0cb" stroke-width="1"/><g fill="#e8e7e2" stroke="#686868"><rect x="62" y="42" width="102" height="48"/><rect x="186" y="92" width="102" height="48"/><rect x="310" y="142" width="102" height="48"/></g><g stroke="#171717" fill="none" stroke-width="1.5"><path d="M164 66h22v50M288 116h22v50"/><path d="M178 109l8 7-8 7M302 159l8 7-8 7"/></g><g fill="#686868" font-family="monospace" font-size="10"><text x="62" y="30">01 / ENTER</text><text x="186" y="80">02 / HOLD</text><text x="310" y="130">03 / EXIT</text></g></g>
+<text x="38" y="432" font-family="Georgia,serif" font-size="26" fill="#171717">SCROLL SEQUENCE</text>
+<text x="682" y="432" text-anchor="end" font-family="monospace" font-size="10" letter-spacing="1" fill="#686868">STUDY / 2026</text>
+</svg>
