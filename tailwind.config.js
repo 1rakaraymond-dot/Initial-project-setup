@@ -6,6 +6,7 @@
 export default {
   content: [
     './index.html',
+    './admin.html',
     './pages/**/*.html',
     './scripts/**/*.js',
   ],

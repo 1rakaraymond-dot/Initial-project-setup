@@ -1,4 +1,4 @@
-const FOLDER_MIME = 'application/vnd.google-apps.folder';
+const FOLDER_MIME = 'application/x-archive-folder';
 const rootId = 'mock-root';
 const now = () => new Date().toISOString();
 const previews = {

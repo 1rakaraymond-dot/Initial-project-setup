@@ -1,13 +1,12 @@
-/** Central configuration. Tokens stay in JS memory and are never persisted to browser storage. */
+/** Central configuration. Tidak ada rahasia di sini: kredensial Google hanya ada di server (.env). */
 export const CONFIG = Object.freeze({
   drive: {
-    mode: 'public', // 'mock' | 'public' | 'live'. Public mode uses an API key and publicly shared folder; no Google login.
-    clientId: '409530570667-l2bnju6jflkanlngsod59mvvmkct22d7.apps.googleusercontent.com', // Google OAuth Web client ID; public client ID only, never a client secret.
-    apiKey: 'AIzaSyATvb9Ir-NowhJ2I8ta4KikU-PDenVE2_Q', // Google Drive API key for public/read-only access. Restrict it to Drive API + this site's HTTP referrers.
-    rootFolderId: '1aFqORJXVm2J1f1vSsXWc2vQvaaHuC64w', // Existing Drive folder whose direct child folders appear in the explorer.
-    scopes: ['https://www.googleapis.com/auth/drive.readonly'], // Used only by optional private live mode; public mode never requests OAuth.
-    pageSize: 100, // Safe range: 25-100.
-    cacheTTL: 60000 // In-memory metadata cache TTL; safe range: 0-300000 ms.
+    // 'server' = baca lewat API server (/api). Tidak ada kunci/ID Google di browser.
+    // 'mock'   = data contoh tanpa server (hanya untuk pratinjau desain).
+    mode: 'server',
+    apiBase: '/api',
+    pageSize: 100, // Dikirim sebagai batas halaman oleh server (server membatasi 10-200).
+    cacheTTL: 15000 // In-memory cache TTL untuk daftar folder; safe range: 0-300000 ms.
   },
   cursor: {
     enabled: true, // Safe range: true/false; automatically disabled for touch and reduced-motion users.

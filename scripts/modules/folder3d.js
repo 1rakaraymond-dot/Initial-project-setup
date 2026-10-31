@@ -13,7 +13,7 @@ function parsedUrl(value) {
 function safePreviewUrl(value) {
   const url = parsedUrl(value);
   if (!url) return '';
-  if (url.origin === window.location.origin && url.pathname.startsWith('/assets/previews/')) return url.href;
+  if (url.origin === window.location.origin && (url.pathname.startsWith('/assets/previews/') || /^\/api\/files\/[\w-]+\/download$/.test(url.pathname))) return url.href;
   if (url.protocol === 'https:' && (['drive.google.com', 'docs.google.com'].includes(url.hostname) || url.hostname.endsWith('.googleusercontent.com'))) return url.href;
   return '';
 }
@@ -48,7 +48,7 @@ function serialisePath(path) {
   return path.map(folder => ({ id: String(folder.id), name: String(folder.name), mimeType: String(folder.mimeType || driveApi.folderMime) }));
 }
 
-export function createFolderExplorer({ elements, onStatus, onConnectRequired }) {
+export function createFolderExplorer({ elements, onStatus }) {
   const rootStyle = document.documentElement.style;
   rootStyle.setProperty('--perspective', `${CONFIG.folder3d.perspective}px`);
   rootStyle.setProperty('--folder-idle-tilt-x', `${CONFIG.folder3d.idleTiltX}deg`);
@@ -175,7 +175,7 @@ export function createFolderExplorer({ elements, onStatus, onConnectRequired }) 
 
     elements.folderStage.innerHTML = folders.length
       ? folders.map((folder, index) => folderMarkup(folder, index)).join('')
-      : '<p class="empty-state">Folder belum tersedia. Tambahkan atau atur folder langsung di Google Drive, lalu pilih Segarkan.</p>';
+      : '<p class="empty-state">Belum ada folder di arsip ini.</p>';
 
     elements.folderStage.querySelectorAll('[data-open-folder]').forEach(button => button.addEventListener('click', async () => {
       const folder = folders.find(item => item.id === button.dataset.openFolder);
@@ -197,7 +197,7 @@ export function createFolderExplorer({ elements, onStatus, onConnectRequired }) 
       const folder = isFolder(item);
       const glyph = fileType(item);
       const metadata = folder ? 'FOLDER' : `${fileType(item)} · ${fileSize(item)}`;
-      const previewUrl = safePreviewUrl(item.webViewLink) || safePreviewUrl(item.thumbnailLink);
+      const previewUrl = safePreviewUrl(item.previewUrl) || safePreviewUrl(item.webViewLink) || safePreviewUrl(item.thumbnailLink);
       let actions = '';
       if (folder) {
         actions = `<button class="file-action" type="button" data-open-item="${escapeHTML(item.id)}">Buka</button>`;
@@ -233,12 +233,12 @@ export function createFolderExplorer({ elements, onStatus, onConnectRequired }) 
 
   function previewFile(item) {
     if (isFolder(item)) return enterFolder(item);
-    const url = safePreviewUrl(item.webViewLink) || safePreviewUrl(item.thumbnailLink);
+    const url = safePreviewUrl(item.previewUrl) || safePreviewUrl(item.webViewLink) || safePreviewUrl(item.thumbnailLink);
     if (url) {
       window.open(url, '_blank', 'noopener,noreferrer');
       return;
     }
-    status('Preview tidak tersedia untuk item ini. Buka tautan Drive atau gunakan Unduh jika tersedia.');
+    status('Preview tidak tersedia untuk jenis file ini. Gunakan Unduh.');
   }
 
   async function runReadAction(action, pendingMessage) {
@@ -249,7 +249,6 @@ export function createFolderExplorer({ elements, onStatus, onConnectRequired }) 
       status('Unduhan dimulai.');
     } catch (error) {
       status(error.message || 'Aksi baca gagal.');
-      if (/Sesi Google|Hubungkan ulang/.test(error.message || '')) onConnectRequired?.();
     } finally {
       setBusy(false);
     }
@@ -277,7 +276,7 @@ export function createFolderExplorer({ elements, onStatus, onConnectRequired }) 
     }
 
     try {
-      if (!state.rootId) throw new Error('Isi CONFIG.drive.rootFolderId di scripts/config.js untuk mode live.');
+      if (!state.rootId) throw new Error('Arsip tidak tersedia.');
       const page = await driveApi.listFiles(currentParent(), null, { signal: controller.signal });
       if (requestId !== state.navigationSequence) return false;
       state.currentItems = page.files || [];
@@ -310,7 +309,6 @@ export function createFolderExplorer({ elements, onStatus, onConnectRequired }) 
       if (elements.loadMoreFolders) elements.loadMoreFolders.hidden = true;
       elements.loadMore.hidden = true;
       status(error.message || 'Folder tidak dapat dimuat.');
-      if (/Sesi Google|Hubungkan ulang/.test(error.message || '')) onConnectRequired?.();
       return false;
     } finally {
       if (requestId === state.navigationSequence) setBusy(false);
@@ -321,8 +319,7 @@ export function createFolderExplorer({ elements, onStatus, onConnectRequired }) 
     driveApi.invalidate();
     const loaded = await navigate({ quiet: true });
     if (!loaded) return;
-    if (CONFIG.drive.mode === 'live') status('Daftar dimuat ulang dari Google Drive. Perubahan yang dibuat di Drive akan tampil di sini.');
-    else status('Daftar contoh disegarkan. Kelola file asli langsung di Google Drive.');
+    status(CONFIG.drive.mode === 'mock' ? 'Daftar contoh disegarkan.' : 'Daftar arsip dimuat ulang.');
   }
 
   async function loadMore() {

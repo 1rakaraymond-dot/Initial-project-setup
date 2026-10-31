@@ -4,11 +4,11 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#100d0f">
-    <meta name="description" content="Arsip folder bergaya gothic yang terhubung ke Google Drive, dengan akses baca saja.">
+    <meta name="description" content="Arsip folder bergaya gothic Blood Moon: jelajahi dan unduh file arsip.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:wght@400;500;600&display=swap" rel="stylesheet">
-    <title>Hunter’s Archive — Google Drive Explorer</title>
+    <title>Hunter’s Archive — Folder Explorer</title>
     <link rel="stylesheet" href="/styles/main.css">
   </head>
   <body>
@@ -20,7 +20,7 @@
       </a>
       <div class="drive-nav__right">
         <span class="drive-nav__mode" id="mode-indicator">MOCK MODE</span>
-        <button class="button button--quiet" id="connect-drive" type="button" hidden>Connect Google Drive <span aria-hidden="true">↗</span></button>
+        <a class="button button--quiet" id="admin-link" href="/admin.html" rel="nofollow">Admin</a>
       </div>
     </header>
 
@@ -43,7 +43,7 @@
             <nav class="breadcrumbs" id="breadcrumbs" aria-label="Lokasi folder"></nav>
           </div>
           <div class="drive-toolbar__actions">
-            <button class="button button--quiet" id="refresh-drive" type="button" aria-label="Segarkan daftar dari sumber data">↻ Segarkan</button>
+            <button class="button button--quiet" id="refresh-drive" type="button" aria-label="Segarkan daftar arsip">↻ Segarkan</button>
           </div>
         </div>
 
@@ -67,7 +67,7 @@
           <button class="load-more" id="load-more" type="button" hidden>Muat file berikutnya ↓</button>
         </section>
 
-        <p class="archive-status" id="status-message" role="status" aria-live="polite">Mode mock aktif. Konten hanya untuk pratinjau; kelola file asli di Google Drive.</p>
+        <p class="archive-status" id="status-message" role="status" aria-live="polite">Memuat arsip…</p>
       </section>
     </main>
 
@@ -82,8 +82,8 @@
       <label>Idle tilt <output id="debug-tilt-value">8°</output><input id="debug-tilt" type="range" min="0" max="12" step="1" value="8"></label>
       <label>Hover lift <output id="debug-hover-value">20 px</output><input id="debug-hover" type="range" min="0" max="30" step="1" value="20"></label>
       <label>Open lift <output id="debug-open-value">60 px</output><input id="debug-open" type="range" min="20" max="80" step="5" value="60"></label>
-      <label class="debug-panel__toggle"><input id="debug-live" type="checkbox"> Gunakan mode live</label>
-      <button class="button button--solid" id="debug-test-fetch" type="button">Test Drive fetch</button>
+      <label class="debug-panel__toggle"><input id="debug-live" type="checkbox"> Gunakan server API (nonaktif = mock)</label>
+      <button class="button button--solid" id="debug-test-fetch" type="button">Test fetch daftar</button>
       <pre id="debug-output" aria-live="polite">Debug output akan muncul di sini.</pre>
     </aside>
     <script type="module" src="/scripts/main.js"></script>
