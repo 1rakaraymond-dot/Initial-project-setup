@@ -34,3 +34,28 @@ export function createIdCodec(secret) {
     }
   };
 }
+
+/** Menyegel objek kecil (mis. sesi upload) menjadi token buram: AES-256-GCM dengan IV acak + kedaluwarsa. */
+export function createSealer(secret) {
+  const key = Buffer.from(crypto.hkdfSync('sha256', Buffer.from(secret), Buffer.from('hunters-archive'), Buffer.from('sealed-tokens'), 32));
+  return {
+    seal(object, ttlMs) {
+      const iv = crypto.randomBytes(12);
+      const cipher = crypto.createCipheriv('aes-256-gcm', key, iv);
+      const body = Buffer.concat([cipher.update(JSON.stringify({ ...object, exp: Date.now() + ttlMs })), cipher.final()]);
+      return Buffer.concat([iv, cipher.getAuthTag(), body]).toString('base64url');
+    },
+    open(token) {
+      if (typeof token !== 'string' || token.length < 40 || token.length > 4096 || !/^[A-Za-z0-9_-]+$/.test(token)) return null;
+      try {
+        const raw = Buffer.from(token, 'base64url');
+        const decipher = crypto.createDecipheriv('aes-256-gcm', key, raw.subarray(0, 12));
+        decipher.setAuthTag(raw.subarray(12, 28));
+        const data = JSON.parse(Buffer.concat([decipher.update(raw.subarray(28)), decipher.final()]).toString('utf8'));
+        return data.exp > Date.now() ? data : null;
+      } catch {
+        return null;
+      }
+    }
+  };
+}

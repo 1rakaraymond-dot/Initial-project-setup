@@ -3,6 +3,8 @@ import https from 'node:https';
 import { Readable } from 'node:stream';
 import { HttpError } from '../errors.js';
 
+const RANGE_END = /bytes=0-(\d+)/;
+
 const FOLDER = 'application/vnd.google-apps.folder';
 const EXPORTABLE = new Set([
   'application/vnd.google-apps.document', 'application/vnd.google-apps.spreadsheet',
@@ -40,6 +42,7 @@ export class DriveStorage {
     this.token = null;
     this.tokenPromise = null;
     this.metaCache = new Map();
+    this.sessionOrigin = new URL(options.uploadBase).origin;
   }
 
   // ---- OAuth ----------------------------------------------------------------------------
@@ -272,6 +275,49 @@ export class DriveStorage {
     }
     this.#invalidate();
     return this.#toItem(JSON.parse(result.body));
+  }
+
+  // ---- Upload per bagian (untuk hosting dengan batas body kecil seperti Vercel) ---------------------
+  /** Membuat sesi upload resumable. URL sesi bersifat rahasia dan HANYA dipegang server (dibungkus token terenkripsi). */
+  async createUploadSession(parentId, name, mimeType, size) {
+    const initUrl = new URL(`${this.o.uploadBase}/files`);
+    initUrl.searchParams.set('uploadType', 'resumable');
+    initUrl.searchParams.set('supportsAllDrives', 'true');
+    initUrl.searchParams.set('fields', FIELDS);
+    const init = await this.#request(initUrl.toString(), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json; charset=UTF-8', 'X-Upload-Content-Type': mimeType, 'X-Upload-Content-Length': String(size) },
+      body: JSON.stringify({ name, parents: [parentId] })
+    });
+    if (!init.ok) throw await this.#fail(init);
+    const session = init.headers.get('location');
+    if (!session) throw new HttpError(502, 'Penyimpanan tidak mengembalikan sesi upload.');
+    return session;
+  }
+
+  async #sessionPut(sessionUrl, headers, body) {
+    const token = await this.#accessToken();
+    const response = await fetch(sessionUrl, { method: 'PUT', redirect: 'manual', headers: { Authorization: `Bearer ${token}`, ...headers }, body });
+    if (response.status === 308) {
+      const match = RANGE_END.exec(response.headers.get('range') || '');
+      return { done: false, next: match ? Number(match[1]) + 1 : 0 };
+    }
+    if (response.status === 200 || response.status === 201) {
+      this.#invalidate();
+      return { done: true, item: this.#toItem(await response.json()) };
+    }
+    if (response.status === 404 || response.status === 410) throw new HttpError(410, 'Sesi upload sudah kedaluwarsa. Ulangi upload.');
+    throw await this.#fail(response);
+  }
+
+  /** Kirim satu bagian. start = offset byte pertama bagian ini, size = ukuran total file. */
+  uploadChunk(sessionUrl, start, buffer, size) {
+    return this.#sessionPut(sessionUrl, { 'Content-Length': String(buffer.length), 'Content-Range': `bytes ${start}-${start + buffer.length - 1}/${size}` }, buffer);
+  }
+
+  /** Tanyakan berapa byte yang sudah diterima (untuk melanjutkan setelah gangguan). */
+  uploadStatus(sessionUrl, size) {
+    return this.#sessionPut(sessionUrl, { 'Content-Length': '0', 'Content-Range': `bytes */${size}` });
   }
 
   async openDownload(id, { range } = {}) {

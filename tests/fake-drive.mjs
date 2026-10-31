@@ -11,6 +11,7 @@ export async function startFakeDrive() {
   const log = [];
   const sessions = new Map();
   let tokenCalls = 0;
+  const stats = { chunks: 0, failAfterPersist: 0 };
   const id = () => crypto.randomBytes(12).toString('base64url');
   const add = ({ name, mimeType = 'text/plain', parents = [], data = Buffer.alloc(0), trashed = false }) => {
     const f = { id: id(), name, mimeType, parents, trashed, data, modifiedTime: new Date().toISOString() };
@@ -54,8 +55,23 @@ export async function startFakeDrive() {
     }
     if (req.method === 'PUT' && p.startsWith('/upload-session/')) {
       const s = sessions.get(p.split('/').pop()); const data = await body(req);
-      if (!s || data.length !== s.declared || Number(req.headers['content-length']) !== s.declared) return send(res, 400, { error: { message: 'size mismatch' } });
-      return send(res, 200, view(add({ name: s.meta.name, mimeType: s.mime, parents: s.meta.parents, data })));
+      if (!s) return send(res, 404, { error: { message: 'session gone' } });
+      const cr = /^bytes (?:(\d+)-(\d+)|\*)\/(\d+)$/.exec(req.headers['content-range'] || '');
+      if (!cr) { // satu request penuh (mode stream)
+        if (data.length !== s.declared || Number(req.headers['content-length']) !== s.declared) return send(res, 400, { error: { message: 'size mismatch' } });
+        return send(res, 200, view(add({ name: s.meta.name, mimeType: s.mime, parents: s.meta.parents, data })));
+      }
+      s.received = s.received || Buffer.alloc(0);
+      const total = Number(cr[3]);
+      const range = () => s.received.length ? { Range: `bytes=0-${s.received.length - 1}` } : {};
+      if (cr[1] === undefined) return send(res, 308, '', range()); // status query
+      stats.chunks += 1;
+      if (Number(cr[1]) !== s.received.length) return send(res, 308, '', range());
+      if (data.length !== Number(cr[2]) - Number(cr[1]) + 1) return send(res, 400, { error: { message: 'length mismatch' } });
+      s.received = Buffer.concat([s.received, data]);
+      if (stats.failAfterPersist > 0) { stats.failAfterPersist -= 1; return send(res, 503, { error: { message: 'backend error' } }); }
+      if (s.received.length === total) return send(res, 200, view(add({ name: s.meta.name, mimeType: s.mime, parents: s.meta.parents, data: s.received })));
+      return send(res, 308, '', range());
     }
     const m = /^\/drive\/v3\/files\/([^/]+)(\/export)?$/.exec(p);
     if (m) {
@@ -81,5 +97,5 @@ export async function startFakeDrive() {
   });
   await new Promise(r => server.listen(0, '127.0.0.1', r));
   const base = `http://127.0.0.1:${server.address().port}`;
-  return { base, files, add, log, get tokenCalls() { return tokenCalls; }, expireToken() { tokenCalls += 1; }, close: () => new Promise(r => { server.close(r); server.closeAllConnections?.(); }), FOLDER };
+  return { base, files, add, log, stats, get tokenCalls() { return tokenCalls; }, expireToken() { tokenCalls += 1; }, close: () => new Promise(r => { server.close(r); server.closeAllConnections?.(); }), FOLDER };
 }

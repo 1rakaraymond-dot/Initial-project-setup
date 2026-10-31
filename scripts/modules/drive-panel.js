@@ -11,7 +11,7 @@ const elements = {
   backFolder: $('back-folder'), loadMoreFolders: $('load-more-folders'),
   folderStage: $('folder-stage'), rootCount: $('root-count'), fileView: $('file-view'), breadcrumbs: $('breadcrumbs'),
   currentFolderTitle: $('current-folder-title'), currentFolderPath: $('current-folder-path'), fileList: $('file-list'),
-  fileSearch: $('file-search'), loadMore: $('load-more'), status: $('status-message'), mode: $('mode-indicator')
+  fileSearch: $('file-search'), loadMore: $('load-more'), status: $('status-message'), mode: $('mode-indicator'), adminLink: $('admin-link')
 };
 
 let explorer;
@@ -75,7 +75,7 @@ async function initAdminLink() {
   try {
     const response = await fetch(`${CONFIG.drive.apiBase}/site`, { headers: { Accept: 'application/json' } });
     const { adminPath } = await response.json();
-    if (typeof adminPath === 'string' && adminPath.startsWith('/')) elements.adminLink.href = adminPath;
+    if (typeof adminPath === 'string' && adminPath.startsWith('/') && elements.adminLink) elements.adminLink.href = adminPath;
   } catch { /* tetap pakai tautan bawaan */ }
 }
 

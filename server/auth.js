@@ -26,40 +26,53 @@ export function safeEqual(a, b) {
   return crypto.timingSafeEqual(sha256(a), sha256(b));
 }
 
-/** Sesi admin disimpan di memori server (token acak; hanya hash-nya yang disimpan). */
-export class SessionStore {
-  constructor({ ttlMs, idleMs }) {
+/**
+ * Sesi admin STATELESS: cookie bertanda tangan HMAC (tidak ada penyimpanan di server), sehingga aman di
+ * lingkungan serverless (Vercel) maupun server biasa. Token CSRF diturunkan dari id sesi.
+ * Konsekuensi: logout menghapus cookie di browser, tetapi cookie yang sudah dicuri tetap valid sampai
+ * kedaluwarsa. Ubah SESSION_EPOCH (atau APP_SECRET) untuk mencabut semua sesi sekaligus.
+ */
+export class SessionManager {
+  constructor({ secret, ttlMs, idleMs, epoch = '' }) {
     this.ttlMs = ttlMs;
     this.idleMs = idleMs;
-    this.map = new Map();
-    this.timer = setInterval(() => this.sweep(), 10 * 60_000);
-    this.timer.unref();
+    this.key = Buffer.from(crypto.hkdfSync('sha256', Buffer.from(secret), Buffer.from('hunters-archive'), Buffer.from(`session-cookie:${epoch}`), 32));
   }
 
-  #key(token) { return sha256(token).toString('hex'); }
+  #sign(body) { return crypto.createHmac('sha256', this.key).update(body).digest('base64url'); }
+  #csrf(sid) { return crypto.createHmac('sha256', this.key).update(`csrf:${sid}`).digest('base64url'); }
+
+  #issue(sid, iat, last) {
+    const body = Buffer.from(JSON.stringify({ sid, iat, last })).toString('base64url');
+    return `${body}.${this.#sign(body)}`;
+  }
 
   create() {
-    const token = crypto.randomBytes(32).toString('base64url');
+    const sid = crypto.randomBytes(16).toString('base64url');
     const now = Date.now();
-    const session = { csrf: crypto.randomBytes(24).toString('base64url'), created: now, last: now };
-    this.map.set(this.#key(token), session);
-    return { token, session };
+    return { token: this.#issue(sid, now, now), session: { csrf: this.#csrf(sid) } };
   }
 
+  /** Mengembalikan { csrf, refreshed? } atau null. refreshed = token baru untuk menggeser batas idle. */
   get(token) {
-    if (!token || typeof token !== 'string' || token.length > 100) return null;
-    const key = this.#key(token);
-    const session = this.map.get(key);
-    if (!session) return null;
+    if (!token || typeof token !== 'string' || token.length > 400) return null;
+    const dot = token.indexOf('.');
+    if (dot < 1) return null;
+    const body = token.slice(0, dot);
+    const given = Buffer.from(token.slice(dot + 1));
+    const expected = Buffer.from(this.#sign(body));
+    if (given.length !== expected.length || !crypto.timingSafeEqual(given, expected)) return null;
+    let data;
+    try { data = JSON.parse(Buffer.from(body, 'base64url').toString('utf8')); } catch { return null; }
     const now = Date.now();
-    if (now - session.created > this.ttlMs || now - session.last > this.idleMs) { this.map.delete(key); return null; }
-    session.last = now;
-    return session;
+    if (!data || typeof data.sid !== 'string' || !Number.isFinite(data.iat) || !Number.isFinite(data.last)) return null;
+    if (now - data.iat > this.ttlMs || now - data.last > this.idleMs || data.iat > now + 60_000) return null;
+    return { csrf: this.#csrf(data.sid), refreshed: now - data.last > 60_000 ? this.#issue(data.sid, data.iat, now) : undefined };
   }
 
-  destroy(token) { if (token) this.map.delete(this.#key(token)); }
-  sweep() { for (const [key, s] of this.map) if (Date.now() - s.created > this.ttlMs || Date.now() - s.last > this.idleMs) this.map.delete(key); }
-  close() { clearInterval(this.timer); }
+  destroy() { /* stateless: cookie dihapus di browser oleh handler logout */ }
+  sweep() {}
+  close() {}
 }
 
 export function parseCookies(header) {

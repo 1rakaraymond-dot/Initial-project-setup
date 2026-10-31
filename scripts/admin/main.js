@@ -27,6 +27,7 @@ function showLogin(message = '') {
 
 function showDashboard(info) {
   session.csrf = info.csrf;
+  session.uploadMode = info.uploadMode;
   state.maxUpload = info.maxUploadBytes;
   el.login.hidden = true; el.dash.hidden = false;
   el.user.textContent = info.username; el.user.hidden = false; el.logout.hidden = false;

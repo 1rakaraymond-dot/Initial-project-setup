@@ -64,4 +64,20 @@ Login · buka folder · **upload file** (banyak sekaligus, drag & drop) · **upl
 
 ## Tes
 
-`npm test` — 20 tes otomatis (auth, CSRF, path traversal, isolasi folder root, upload/download/Range, adapter Drive terhadap server Drive tiruan).
+`npm test` — 28 tes otomatis (auth, CSRF, path traversal, isolasi folder root, upload/download/Range, adapter Drive terhadap server Drive tiruan).
+
+## Deploy ke Vercel
+
+Proyek sudah memuat `api/index.js` (fungsi serverless) dan `vercel.json` (rewrite + header keamanan). Halaman statis disajikan CDN Vercel, `/api/*` dijalankan sebagai fungsi.
+
+1. Push kode ke GitHub.
+2. vercel.com → **Add New → Project** → impor repo. Framework Preset: **Vite** (otomatis). Build/Output sudah diatur oleh `vercel.json`.
+3. **Environment Variables** (tidak perlu `NODE_ENV`, `TRUST_PROXY`, `PORT`):
+   `APP_SECRET`, `ADMIN_USERNAME`, `ADMIN_PASSWORD_HASH`, `STORAGE_BACKEND=drive`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REFRESH_TOKEN`, `DRIVE_ROOT_FOLDER_ID`. Opsional: `MAX_UPLOAD_MB`, `SESSION_HOURS`, `SESSION_EPOCH`.
+4. Deploy. Alamat admin di Vercel selalu **/admin** (`ADMIN_PATH` diabaikan).
+
+Perbedaan dari server biasa:
+- **Upload per bagian**: fungsi Vercel menolak body > 4,5 MB, jadi browser memotong file menjadi bagian 4 MB. Gangguan jaringan ditangani otomatis (dilanjutkan dari bagian terakhir yang tersimpan).
+- **Login tanpa memori server**: sesi berupa cookie bertanda tangan. Logout menghapus cookie di browser, tetapi cookie yang sudah dicuri tetap berlaku sampai kedaluwarsa. Untuk mencabut semua sesi: ubah `SESSION_EPOCH` (atau `APP_SECRET`) lalu deploy ulang.
+- **Pembatas percobaan login bersifat per-instance** (memori), jadi tidak seketat di server tunggal. Pakai password panjang (≥ 16 karakter).
+- Unduhan file lewat fungsi dibatasi durasi 300 detik dan memakai kuota transfer Vercel. Paket Hobby untuk penggunaan non-komersial.

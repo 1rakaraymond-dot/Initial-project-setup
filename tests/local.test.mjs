@@ -167,3 +167,11 @@ test('/api/site memberi tahu alamat admin untuk tombol di halaman publik', async
   const r = await makeClient(ctx.base).json('GET', '/api/site');
   assert.equal(r.status, 200); assert.equal(r.data.adminPath, '/admin');
 });
+
+test('Sec-Fetch-Site: cross-site ditolak, same-origin diterima meski Host diubah proxy', async () => {
+  const c = ctx.client;
+  const bad = await c.json('POST', '/api/admin/folders', { body: { parent: 'root', name: 'SFS1' }, headers: { 'sec-fetch-site': 'cross-site' } });
+  assert.equal(bad.status, 403);
+  const same = await c.json('POST', '/api/admin/folders', { body: { parent: 'root', name: 'SFS2' }, headers: { 'sec-fetch-site': 'same-origin', origin: 'https://tunnel.contoh.net' } });
+  assert.equal(same.status, 201);
+});
